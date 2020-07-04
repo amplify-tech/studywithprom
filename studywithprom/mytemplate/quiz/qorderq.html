@@ -1,0 +1,131 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Ordering</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="{% static 'icon.png' %}" rel="icon">
+  <link href="{% static 'icon.png' %}" rel="apple-touch-icon">
+
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+
+  <style>
+    #mylist{
+      font-size: 20px;
+      border: 2px solid green;
+      width: 80%;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #mylist li{
+      padding: 6px;
+      margin: 6px;
+      background-color: lightgrey;
+      cursor: move;
+    }
+    #save{
+     font-size: 18px; 
+     width: 70px;
+     padding: 5px;  
+     margin-right: auto;
+     margin-left: auto;
+    }
+
+  </style>
+</head>
+<body>
+
+<div>
+  <h2 style="text-align: center;">{{thequiz.title}}</h2>
+  <button id="save"> save </button>
+  <p id="msz" style="text-align: center;font-size: 20px; color: green; display: none;">saved</p>
+</div>
+
+  <ol id="mylist">
+    {% for q in all_itsQ %}
+      <li data-catid="{{q.id}}" >{{q.title}}</li>
+    {% endfor %}
+  </ol>
+
+<br><br>
+<p style="width: 80%;max-width: 600px;margin-left: auto;margin-right: auto;">drag and drop  questions , after reordering save it , this question order will reflect in the quiz , see preview after saving.</p>
+<br>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.10.1.min.js" ></script>
+<script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+
+<script type="text/javascript">
+
+// this part(only for mobile) is little tricky so i am using it from this source:-
+// from here -----------------------------------------------
+  /*
+ * jQuery UI Touch Punch 0.2.2
+ *
+ * Copyright 2011, Dave Furfero
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ *
+ * Depends:
+ *  jquery.ui.widget.js
+ *  jquery.ui.mouse.js
+ */
+(function(b){b.support.touch="ontouchend" in document;if(!b.support.touch){return;}var c=b.ui.mouse.prototype,e=c._mouseInit,a;function d(g,h){if(g.originalEvent.touches.length>1){return;}g.preventDefault();var i=g.originalEvent.changedTouches[0],f=document.createEvent("MouseEvents");f.initMouseEvent(h,true,true,window,1,i.screenX,i.screenY,i.clientX,i.clientY,false,false,false,false,0,null);g.target.dispatchEvent(f);}c._touchStart=function(g){var f=this;if(a||!f._mouseCapture(g.originalEvent.changedTouches[0])){return;}a=true;f._touchMoved=false;d(g,"mouseover");d(g,"mousemove");d(g,"mousedown");};c._touchMove=function(f){if(!a){return;}this._touchMoved=true;d(f,"mousemove");};c._touchEnd=function(f){if(!a){return;}d(f,"mouseup");d(f,"mouseout");if(!this._touchMoved){d(f,"click");}a=false;};c._mouseInit=function(){var f=this;f.element.bind("touchstart",b.proxy(f,"_touchStart")).bind("touchmove",b.proxy(f,"_touchMove")).bind("touchend",b.proxy(f,"_touchEnd"));e.call(f);};})(jQuery);
+
+// to here ---------------------------------------------
+
+$(document).on("pagecreate", function() {
+    $( "#mylist" ).sortable();
+    $( "#mylist" ).disableSelection();
+    //Refresh list to the end of sort to have a correct display
+    // $( "#mylist" ).on( "sortstop", function(event, ui) {
+    //     if($('#mylist').hasClass('ui-listview')) {
+    //       $('#mylist').listview('refresh');
+    //     } 
+    //     else{
+    //       $('#mylist').trigger('create');
+    //     }
+
+    //       // $('#mylist').listview().listview('refresh');
+    //       // $('#mylist').listview('refresh');
+    // });
+});
+
+</script>
+
+
+<script>
+$('#save').click(function(){
+  var qorderdict = {};
+
+  var allq = $("#mylist li");
+  allq.each(function(i,obj) {
+    var qorder = $(obj).index();
+    var qid = $(obj).attr("data-catid");
+    qorderdict[i] = qid;
+  });
+
+    $.ajax(
+    {
+        type:"post",
+        url: "/quiz/saveorder/{{thequiz.id}}",
+        data:{
+             qorderdict: JSON.stringify(qorderdict)
+        },
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        success: function( data ) 
+        {
+          $('#msz').show();
+          $('#msz').fadeOut(1500);
+        }
+     })
+
+  });
+
+
+</script>
+</body>
+</html>

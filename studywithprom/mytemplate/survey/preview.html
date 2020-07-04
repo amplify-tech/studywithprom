@@ -1,0 +1,417 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>viewform</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="{% static 'icon.png' %}" rel="icon">
+  <link href="{% static 'icon.png' %}" rel="apple-touch-icon">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<style>
+  body{
+    font-size: 18px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: {{survey.style.bgcolor}};  
+  }
+  td{
+    padding-bottom: 8px;
+  }
+  td:first-child{
+    vertical-align: top;
+  }
+
+  .allq{
+    margin-left: auto;
+    margin-right: auto;
+    width: 95%;
+    max-width: 600px;
+  }
+
+  .header{
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    padding: 0 8px;
+    border-radius: 10px;
+    background-color: {{survey.style.head}}; 
+  }
+
+  .oneq{
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 2px 8px 10px 8px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    background-color: {{survey.style.theme}};
+  }
+  .reqtag, .reqerror{
+    color: #800000;
+  }
+  .answer{
+    margin-left: 5px;
+
+  }
+  input.answer, textarea.answer{
+    font-size: 18px;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    border-bottom: 1px solid #800000;
+  }
+
+  input[type=text].answer{
+    width: 80%;
+  }
+  input[type=range].answer{
+    width: 100%;
+    margin: 0;
+  }
+  input[type=file].answer{
+    margin: 0;
+    border: none;
+  }
+
+  textarea.answer{
+    width: 90%;
+    border: 1px solid #800000;
+  }
+
+  input[type=radio].answer{
+    width: 18px;
+    height: 18px;
+  }
+  input[type=checkbox].answer{
+    width: 18px;
+    height: 18px;
+  }
+  select{
+    font-size: 17px;
+    margin-left: 5px;
+    margin-bottom: 8px;
+    max-width: 80%;
+    overflow: auto;
+  }
+</style>
+<style>
+  
+@media (max-width: 750px) {
+  input[type=radio]{
+    width: 20px !important;
+    height: 20px !important;
+  }
+  input[type=checkbox]{
+    width: 20px !important;
+    height: 20px !important;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<div class="allq" id="allq">
+    <div class="header">
+      <h2>{{survey.title}}</h2>
+      <p style="text-align: left;">{{survey.desc}}</p>
+      <p style="text-align: left;color: #800000;">*Required</p>
+    </div>
+
+        {% for Q , optlist in Qdict.items %}
+      <div class="oneq"  data-catid={{Q.id}}>
+
+          <p class="question"> {{ Q.title }} 
+            {% if Q.required %}
+            <span style="color: red;"> &nbsp; *</span>
+            <span class="reqtag" style="display: none;">Required</span>
+            {% endif %}
+          </p>
+
+      <!-- short answer type -->
+    {% if Q.qtype == 0 %}
+      <div class="ansdiv shortans">
+        <input type="text" class="answer textans" placeholder="short answer here">
+      </div>
+      <!-- long answer type -->
+    {% elif Q.qtype == 1 %}
+      <div class="ansdiv longans">
+        <textarea class="answer textans" rows="4" placeholder="long answer here"></textarea>
+      </div>
+
+        <!-- date answer type -->
+    {% elif Q.qtype == 6 %}
+      <div class="ansdiv dateans" >
+        <input type="date" class="answer textans dateans">
+      </div>
+      <!-- time answer type -->
+    {% elif Q.qtype == 7 %}
+      <div class="ansdiv timeans" >
+        <input type="time" class="answer textans timeans" >
+      </div>
+      <!-- file upload answer type -->
+    {% elif Q.qtype == 8 %}
+      <div class="ansdiv fileans">
+        <input type="file" class="answer fileans">
+      </div>
+
+      <!-- linear scale answer type -->
+    {% elif Q.qtype == 5 %}
+      <div class="ansdiv linearans">
+
+        <div style="width: 85%; margin-right: auto; margin-left: auto;">
+        <span style="float: left; max-width: 45%;">{{Q.constraint.2}}</span>
+        <span style="float: right; max-width: 45%; direction: rtl;">{{Q.constraint.3}}</span>
+        <input type="range" class="answer textans linearans" min="{{Q.constraint.0|default:1}}"
+        max="{{Q.constraint.1|default:10}}" >
+        <br>
+        <span style="float: left;">{{Q.constraint.0|default:1}}</span>
+        <span style="float: right;">{{Q.constraint.1|default:10}}</span>
+        <br>
+        <span>answer: </span><span class="rangeVal"></span>
+        </div>
+
+      </div>
+
+    {% elif Q.qtype == 2 %}
+    <div class="ansdiv optans">
+      <table>
+        {% for opt in optlist %}
+        <tr>
+          <td>
+          {% if Q.required %}
+          <input type="radio" class="answer optans" data-catid={{opt.id}}
+           name="{{Q.id}}">
+          {% else %}
+          <input type="radio" class="answer optans notreq" data-catid={{opt.id}}
+           name="{{Q.id}}">
+          {% endif %}
+         </td>
+         <td><span>{{opt.value}}</span></td>
+        </tr>
+        {% endfor %}
+
+          {% if Q.other %}
+         <tr> 
+          <td>other:</td>
+          <td><input type="text" class="answer textans otherans"> </td>
+         </tr>  
+          {% endif %}
+    </table>
+    {% if Q.required %}
+    {% else %}
+      <button class="antiradio" style="display: none; float: right;">clear selection</button>
+      <br>
+    {% endif %}
+
+    </div>
+
+    {% elif Q.qtype == 3 %}
+    <div class="ansdiv optans">
+      <table>
+        {% for opt in optlist %}
+        <tr>
+          <td><input type="checkbox" class="answer optans" data-catid={{opt.id}}></td>
+          <td><span data-catid={{opt.id}} >{{opt.value}}</span></td>
+        </tr>
+        {% endfor %}
+        
+          {% if Q.other %}
+         <tr>
+          <td>other:</td>
+          <td><input type="text" class="answer textans otherans"></td>
+         </tr>
+          {% endif %}
+      </table>
+    </div>
+
+    {% elif Q.qtype == 4 %}
+    <div class="ansdiv optans">
+      <select>
+        <option data-catid='-1'> --select-- </option>
+        {% for opt in optlist %}
+        <option data-catid={{opt.id}}>{{opt.value}}</option>
+        {% endfor %}
+
+      </select>
+      {% if Q.other %}
+      <br>
+       <span>other:</span> <input type="text" class="answer textans otherans">
+      {% endif %}
+    </div>
+
+    
+    {% else %}
+    <p style="color: red;">Question type not match !</p>
+      
+    {% endif %}
+
+      </div>
+  {% endfor %}
+
+      <br>
+      <p class="reqerror" style="display: none;"> please fill the required fileds! </p>
+      <button  id="saveform" style="font-size: 18px; color: white;
+      background-color: #b300b3; margin-left: 40%; margin-right: 40%;"> Submit </button>
+      <br><br>
+
+      </div>
+
+
+<br><br>
+
+<div style="text-align: center; display: none;" id="seeresdiv">
+  <h2>Your response has been recorded</h2>
+  <p>{{ survey.title }}</p>
+  <br>
+  <button id="seeres">see your response</button>
+  <br><br><br>
+</div>
+<br>
+<div style="text-align: center;">
+  <span> &#169; 2020 Myform Product </span>
+</div>
+<br>
+<script>
+
+$('#saveform').click(function(){
+
+  var valid = true;
+  var reqQ = $('.reqtag');
+  reqQ.hide();
+  $('.reqerror').hide();
+
+  reqQ.each(function(i, obj) {
+    var parent = $(obj).closest('.oneq');
+
+    var textans = "";
+    textele = $(parent).find(".textans");
+    if (textele.length > 0) {
+          textans = $.trim($(textele).val());
+    } else {}
+
+    var all_radio_ans = $(parent).find('input[type="radio"]:checked');
+    var all_select_ans = $(parent).find('.optans option:selected');
+    var all_checkbox_ans = $(parent).find('input[type="checkbox"]:checked');
+
+    if ( textans.length==0 && all_radio_ans.length==0 && 
+         all_select_ans.length==0 && all_checkbox_ans.length==0){
+          valid = false;
+          $(obj).show();
+    }
+    else if(all_radio_ans.length==1 && textans.length==0){
+      if(all_radio_ans.eq(0).attr('data-catid').toString() == '-1'){
+        valid = false;
+       $(obj).show();
+      }
+    }
+    else if(all_select_ans.length==1 && textans.length==0){
+      if(all_select_ans.eq(0).attr('data-catid').toString() == '-1'){
+        valid = false;
+       $(obj).show();
+      }
+    }
+
+  });
+
+
+
+  if (valid){ 
+
+  var allqlist = $(".oneq");
+  var responseDict = {};
+  allqlist.each(function(j, obj) {
+      var qid = $(obj).attr("data-catid");
+
+      var textans = "";
+      textele = $(obj).find(".textans");
+      if (textele.length > 0) {
+            textans = $.trim($(textele).val());
+      } else {}
+
+      var optansdict = {};
+
+      var all_radio_ans = $(obj).find('input[type="radio"]:checked');
+      var all_select_ans = $(obj).find('.optans option:selected');
+      var all_checkbox_ans = $(obj).find('input[type="checkbox"]:checked');
+
+      all_radio_ans.each(function(x, obj) {
+        optansdict[x] = $(obj).attr("data-catid");
+      });
+
+      all_select_ans.each(function(y, obj) {
+        optansdict[y] = $(obj).attr("data-catid");
+      });
+
+      all_checkbox_ans.each(function(z, obj) {
+        optansdict[z] = $(obj).attr("data-catid");
+      });
+
+
+      var qdict = {"textans":textans, "optansdict":optansdict};
+
+     responseDict[qid] = qdict;
+   });
+
+      $.ajax(
+      {
+          type:"post",
+          url: "/survey/saveresponse/{{survey.id}}",
+          data:{ 
+               responseDict: JSON.stringify(responseDict)
+          },
+
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: function( data ) 
+          {
+            $('.allq').hide();
+            $('#seeresdiv').show();
+            $('input, select, textarea').prop("disabled", true);
+            $('.shortans>input').attr("placeholder", "unattempted");
+            $('textarea').attr("placeholder", "unattempted");
+            $('.antiradio').remove();
+            $('#saveform').remove();
+
+          }
+       })
+
+
+  }
+  else{
+    $('.reqerror').show();
+  }
+
+});
+
+
+$('.antiradio').click(function(){
+  var parent = $(this).closest('.oneq');
+  var allRadio = $(parent).find('input[type="radio"]:checked');
+  allRadio.prop("checked", false);
+  $(this).hide();
+});
+
+$('input[type=radio].notreq').change(function() {
+  var parent = $(this).closest('.oneq');
+  var antibtn = $(parent).find('.antiradio');
+  antibtn.show();
+});
+
+
+$('input[type=range]').on('input', function() {
+  var value = $(this).val();
+  $(this).closest('.oneq').find('.rangeVal').text(value);
+});
+
+
+$('#seeres').click(function(){
+  $('.allq').show();
+  $(this).remove();
+});
+</script>
+</body>
+</html>

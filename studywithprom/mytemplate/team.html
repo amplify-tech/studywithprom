@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Team</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="{% static 'icon.png' %}" rel="icon">
+  <link href="{% static 'icon.png' %}" rel="apple-touch-icon">
+<style>
+  body{
+    font-size: 18px;
+    margin: 0;
+    background-color: white;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  nav{
+    width: 100%;
+    padding: 4px 0;
+    margin: 0;
+    background-color: black;
+    color: white;
+    font-size: 28px;
+    position: fixed;
+    top: 0;
+    text-align: right;
+  }
+  .main{
+    display: flex;
+    flex-wrap: wrap;
+    /*border: 1px solid black;*/
+    justify-content: space-around;
+  }
+  .card{
+    border-radius: 10px;
+    background-color: #f2f2f2;
+    border: 1px solid black;
+    width: 31%;
+    max-width: 300px;
+    padding: 10px 6px;
+    margin-bottom: 18px;
+     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+  .card div{
+    text-align: center;
+  }
+  .card img{
+    height: 300px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @media screen and (max-width: 900px){
+    .card{
+      width: 90%;
+      max-width: 500px; 
+    }
+    .card img{
+      width: 200px;
+      height: auto;
+    }
+
+  }
+
+@media print{
+  body {
+    background-color: black;
+  }
+}
+
+</style>
+</head>
+<body>
+<nav>
+  <span style="float: left;">Team</span>
+  <span>myform</span>
+</nav>
+
+<br><br><br>
+<a href="" onclick="window.print()">print</a>
+<div class="main">
+  <div class="card">
+   <div> <img src="{% static 'image/team/jagdish.jpeg' %}"></div>
+    <p><b>Jagdish Suthar </b> <br>
+    B.Tech III <br>
+    Computer Science and Engineering <br>
+    <b>IIT Bombay</b> </p>
+    <a href="https://www.cse.iitb.ac.in/~jagdishsuthar/">
+      www.cse.iitb.ac.in/~jagdishsuthar/</a>
+  </div>
+  <div class="card">
+   <div> <img src="{% static 'image/team/akram.jpg' %}"></div>
+    <p><b>Akram Khan </b> <br>
+    B.Tech III <br>
+    Computer Science and Engineering <br>
+    <b>IIT Bombay</b> </p>
+    <a href="https://www.cse.iitb.ac.in/~akramkhan/">
+      www.cse.iitb.ac.in/~akramkhan/</a>
+  </div>
+  <div class="card">
+   <div> <img src="{% static 'image/team/kaushal.jpg' %}"></div>
+    <p><b>Kaushal U </b> <br>
+    B.Tech III <br>
+    Computer Science and Engineering <br>
+    <b>IIT Bombay</b> </p>
+    <a href="https://www.cse.iitb.ac.in/~kaushalnayaka/">
+      www.cse.iitb.ac.in/~kaushalnayaka/</a>
+  </div>
+  
+</div>
+</body>
+</html>

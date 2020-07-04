@@ -1,0 +1,240 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>result</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="{% static 'icon.png' %}" rel="icon">
+  <link href="{% static 'icon.png' %}" rel="apple-touch-icon">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<style>
+  body{
+    font-size: 18px;
+    font-family: "Helvetica Neue", "Helvetica, Arial", sans-serif;
+    background-color: {{quiz.style.bgcolor}};  
+  }
+  .allq{
+    margin-left: auto;
+    margin-right: auto;
+    width: 95%;
+    max-width: 600px;
+  }
+
+  .header{
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 8px;
+    border-radius: 10px;
+    background-color: {{quiz.style.head}}; 
+  }
+
+  .oneq{
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 2px 8px 10px 8px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    background-color: {{quiz.style.theme}};
+  }
+  .answer{
+    margin-left: 5px;
+
+  }
+
+  input[type=radio].answer{
+    width: 18px;
+    height: 18px;
+  }
+  input[type=checkbox].answer{
+    width: 18px;
+    height: 18px;
+  }
+
+.wrongopt{
+  outline: 2px solid red;
+}
+.rightopt{
+  outline: 2px solid green;
+}
+.correctopt{
+   outline: 1px solid green;
+}
+
+  table{
+    width: 90%;
+    border: 2px solid green;
+    border-collapse: collapse;
+  }
+  td,th{
+    border: 1px solid black;
+  }
+  td{
+    padding-bottom: 8px;
+  }
+  td:first-child{
+    vertical-align: top;
+  }
+  .status{
+    padding: 10px ;
+    border-radius: 50%;
+    display: inline-block;
+    float: right;
+    margin-left: 10px;
+    background-color: white;
+  }
+  .correct{
+    background-color: green;
+  }
+  .wrong{
+    background-color: red;
+  }
+  .mark0{
+    background-color: yellow;
+  }
+
+
+</style>
+
+</head>
+<body>
+
+<div class="allq" id="allq">
+    <div class="header">
+      <h2 style="text-align: center;">{{quiz.title}}</h2>
+      <p>{{quiz.desc}}</p>
+      <span>Student code: {{ std_code }}</span> 
+      <span style="float: right;">total marks: {{total_marks}}/{{max_marks}}</span>
+      <br><br>
+    </div>
+
+        {% for Q , Qinfo in Qdict.items %}
+      <div class="oneq"  data-catid={{Q.id}}>
+
+       <p class="question"> {{ Q.title }}
+        <!-- status -->
+        {% if Qinfo.1 ==  Q.pmarks %}
+       <span class="status correct"> </span>
+        {% elif Qinfo.1 < 0 %}
+       <span class="status wrong"> </span>
+        {% elif Qinfo.1 == 0 %}
+       <span class="status mark0"> </span>
+        {% else %}
+       <span class="status"> </span>
+       {% endif %}
+
+
+       <span style="float: right; color: blue;"> {{ Qinfo.1 }}/{{ Q.pmarks }} marks</span>
+       </p>
+  {% if Qinfo.0 %}
+       <!-- this means user has seen the Question -->
+
+      <!-- short answer type -->
+     {% if Q.qtype <= 1 %}
+      <div class="ansdiv shortans">
+        <p style="color: green;">correct answer: {{ Q.answer }}</p>
+        <p>your answer: {{ Qinfo.2 }}</p>
+      </div>
+      <!-- numeric answer type -->
+
+
+    <!-- mcq single ans -->
+     {% elif Q.qtype == 2 %}
+    <div class="ansdiv optans">
+      <table>
+        <tr>
+          <td>correct</td>
+          <td>option</td>
+          <td>you ans</td>
+        </tr>
+
+        {% for opt in Qinfo.2 %}
+        <tr>
+          <td>
+            {% if opt.0.isans %}
+          <input type="radio" class="answer optans correctopt" checked disabled>
+           {% else %}
+          <input type="radio" class="answer optans" disabled>
+           {% endif %}
+         </td>
+
+         <td><span>{{opt.0.value}}</span></td>
+
+         <td>
+            {% if opt.1 %}
+          <input type="radio" class="answer optans" checked disabled>
+           {% else %}
+          <input type="radio" class="answer optans" disabled>
+           {% endif %}
+         </td>
+        </tr>
+        {% endfor %}
+    </table>
+      <button class="antiradio" style="display: none; float: right;">clear selection</button>
+      <br>
+
+    </div>
+
+    <!-- mcq multiple ans -->
+      {% elif Q.qtype == 3 %}
+    <div class="ansdiv optans">
+      <table>
+        <tr>
+          <td>correct</td>
+          <td>option</td>
+          <td>you ans</td>
+        </tr>
+        {% for opt in Qinfo.2 %}
+        <tr>
+          <td>
+           {% if opt.0.isans %}
+          <input type="checkbox" class="answer optans correctopt" checked disabled>
+           {% else %}
+          <input type="checkbox" class="answer optans" disabled>
+           {% endif %}
+
+          </td>
+          <td><span>{{opt.0.value}}</span></td>
+          <td>
+           {% if opt.1 %}
+          <input type="checkbox" class="answer optans"  
+              checked disabled>
+           {% else %}
+          <input type="checkbox" class="answer optans" disabled>
+           {% endif %}
+          </td>
+
+        </tr>
+        {% endfor %}
+        
+      </table>
+    </div>
+
+        {% else %}
+        <p style="color: red;">Question type not match !</p>
+        {% endif %}
+
+  {% else %}
+  <p style="color: #b3003b;">late released Question</p>
+  {% endif %}
+
+    </div>
+  {% endfor %}
+
+      </div>
+
+
+<br><br><br>
+
+<div style="text-align: center;">
+  <span> &#169; 2020 Myform Product </span>
+</div>
+<br><br>
+
+</body>
+</html>

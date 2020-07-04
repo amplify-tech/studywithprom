@@ -1,0 +1,427 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title> Response </title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="{% static 'icon.png' %}" rel="icon">
+  <link href="{% static 'icon.png' %}" rel="apple-touch-icon">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<style>
+  body{
+    font-size: 18px;
+  }
+  button, select{
+    cursor: pointer;
+  }
+  table {
+    font-size: 14px;
+    border: 2px solid green;
+  }
+  th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 8px;
+    text-align: left;
+  }
+  th{
+    min-width: 135px;
+  }
+th:nth-child(1) {  
+  min-width: 50px;
+  width: 50px;
+}
+  table tr:nth-child(even) {
+    background-color: #fff;
+  }
+  table tr:nth-child(odd) {
+   background-color: #eee;
+  }
+  table th {
+    color: green;
+    background-color: #bfbfbf;
+  }
+  tr:hover{
+    background-color: yellow;
+  }
+
+#formttl{
+  font-size: 22px; 
+  font-weight: bolder; 
+  background-color: #ccffff;
+  cursor: pointer;
+  padding: 4px 8px;
+ }
+
+#change_date{
+  font-size: 14px;
+}
+#graphdiv{
+  display: block;
+  padding: 0;
+}
+.onegraph{
+  border: 2px solid green;
+  width: 100%;
+  height: 400px;
+  max-width: 550px;
+  max-height: 450px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 5px 0 10px 0;
+}
+.temp{
+  width: 100%;
+  height: 375px;
+  max-width: 550px;
+  max-height: 425px;
+  padding: 0;
+}
+
+.btn{
+  font-size: 18px;
+  padding: 2px 8px;
+}
+.fontsize{
+  font-size: 22px;
+  padding: 2px 3px;
+  cursor: pointer;
+}
+.fontsize:active{
+  background-color: yellow;
+}
+
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar" style="float: left;">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+     <a href="#showtable" class="navbar-brand" style="color: white;">Response sheet</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+
+<a role="button" class="btn btn-primary navbar-btn" target="_blank" 
+   href="/quiz/viewform/{{quiz.access_code}}">Preview</a>
+<a role="button" class="btn btn-success navbar-btn" target="_blank" 
+   href="/quiz/editor/{{quiz.id}}">editor</a>
+</ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li ><a href="/quiz/"><span class="glyphicon glyphicon-user"></span> {{user.first_name}}</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<br><br>
+
+<div class="container-fluid" >
+
+<p id="formttl"> &#8691; {{quiz.title}} </p>
+<div id="formdtl" style="display: none;">
+<p> created at: {{quiz.createDate|date:'h:i A, d-M-y'}} </p>
+<p> deadline: {{quiz.endDate|date:'h:i A, d-M-y'}} </p> 
+<p>{{resdict | length}} responses</p>
+<p> {{quiz.desc}} </p>
+</div>
+
+<div style="margin: 5px 0 12px 0; text-align: left; font-size: 18px;">
+  <span class="fontsize" data-type="-">&#8854;</span>
+  <span class="fontsize" data-type="+">&#8853;</span>
+
+  <button id="showtable" style="font-size: 16px; margin-bottom: 10px;">Hide Table</button>
+  <button id="showgraph" style="font-size: 16px; display: none;">Hide Graph</button>
+  <button id="fetchgraph" style="font-size: 16px;">Show Graph</button>
+  <a href="/quiz/tocsv/{{quiz.id}}" style="white-space: nowrap"> Download csv </a>
+</div>
+
+<table id="restbl">
+    <tr>
+      <th>id</th>
+      <th>
+        response_time <br>
+        <select id="change_date">
+          <option>d/MM/YY h:m</option>
+          <option>d/m/YY h:m</option>
+          <option>d/m/y h:m</option>
+          <option>d/m/YY H:m</option>
+          <option>m/d/YY h:m</option>
+          <option>d/m   H:m</option>
+          <option>d/MM   H:m</option>
+        </select>
+      </th>
+      <th>user</th>
+      <th>student code</th>
+      <th>student report at  <br>
+          (website) + /quiz/result/ + (below code)
+      </th>
+      {% for q in allQ %}
+        <th>{{q.title | slice:"0:40"}}</th>
+      {% endfor %}
+      <th> delete [ on delete alert me
+        <input type="checkbox" style="width: 15px; height: 15px;" checked id="alertme"> ]
+      </th>
+    </tr>
+    
+  {% for res, reslist in resdict.items %}
+  <tr>
+  <td>{{forloop.counter}}</td>
+  <td>{{ res.response_time | date:'d/M/Y, h:i A' }}</td>
+  <td> {% if res.user  %} {{ res.user.first_name }} {% endif %}</td>
+  <td> {{ res.std_code }}</td>
+  <td><a href="/quiz/result/{{ res.access_code }}" target="_blank">{{ res.access_code }}</a></td>
+
+      {% for ans in reslist.0 %}
+
+        {% if ans.textans %}
+        <td> {{ ans.textans }} </td>
+
+        {% else %}
+        <td>
+          {% for optid, optval in ans.options.items %}
+            <span> {{optval}}{% if not forloop.last %}, {% endif %} &nbsp; </span>
+          {% endfor %}
+        </td>
+        {% endif %}
+
+      {% endfor %}
+
+      {% for col in reslist.1 %}
+      <td> </td>
+      {% endfor %}
+
+    <td> <button class="delresponse" data-catid="{{ res.id }}">&#10060;</button> </td>
+
+   </tr>
+  {% endfor %}
+</table>
+
+<br>
+
+<div id="graphdiv"></div>
+
+</div>
+<br><br><br>
+
+<script>
+$('.fontsize').click(function(){  
+  var old = parseFloat($('#restbl').css('font-size'));
+  var oldwidth = parseFloat($('th').eq(1).css('min-width'));
+  if($(this).attr('data-type') ==  '-'){
+    var newsize = old-2;
+    if(newsize<4){ newsize=4; }
+    else{ var newwidth = oldwidth-15; }
+  }
+  else{
+    var newsize = old+2;
+    var newwidth = oldwidth+15;
+  }
+  $('#restbl').css('font-size', String(newsize) + 'px');
+  $('#change_date').css('font-size', String(newsize) + 'px');
+  $('th').css('min-width', String(newwidth) + 'px');
+});
+
+$('#formttl').click(function(){
+  $('#formdtl').slideToggle();
+  });
+
+  $('#showtable').click(function(){
+    $('#restbl').toggle();
+    if ($(this).text()=="Hide Table") {
+       $(this).text("Show Table");
+    } else {
+       $(this).text("Hide Table");
+    }
+  });
+
+  $('#showgraph').click(function(){
+    $('#graphdiv').toggle();
+    if ($(this).text()=="Show Graph") {
+       $(this).text("Hide Graph");
+    } else {
+       $(this).text("Show Graph");
+    }
+  });
+
+</script>
+
+<script>
+
+  $('.delresponse').click(function(){
+    if( $('#alertme').prop("checked")){
+      var imsure = confirm('Are you sure you want to delete this response?');
+    }
+    else{
+      var imsure = true;
+    }
+    if(imsure){
+      var resid = $(this).attr("data-catid");
+      $(this).closest("tr").remove();
+
+        $.ajax(
+        {
+            type:"post",
+            url: "/quiz/deloneresponse/{{quiz.id}}",
+            data:{ 
+                 resid : resid
+            },
+
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            success: function( data ) 
+            {
+            }
+         })
+
+  }else{}
+
+});
+
+
+$('#change_date').change(function(){
+
+  var which_format = $(this)[0].selectedIndex;
+
+  var alldate = $('table tr td:nth-child('+2+')');
+
+  {% for res, reslist in resdict.items %}
+      var i = "{{forloop.counter | add:-1}}";
+
+      switch(which_format) {
+      case 0:
+        var ddmmyy = '{{res.response_time | date:'d/M/Y, h:i A' }}';
+        break;
+      case 1:
+        var ddmmyy = '{{res.response_time | date:'d/m/Y, h:i A' }}';
+        break;
+      case 2:
+        var ddmmyy = '{{res.response_time | date:'d/m/y, h:i A' }}';
+        break;
+      case 3:
+        var ddmmyy = '{{res.response_time | date:'d/m/Y, H:i' }}';
+        break;
+      case 4:
+        var ddmmyy = '{{res.response_time | date:'m/d/Y, h:i A' }}';
+        break;
+      case 5:
+        var ddmmyy = '{{res.response_time | date:'d/m, H:i' }}';
+        break;
+      case 6:
+        var ddmmyy = '{{res.response_time | date:'d/M, H:i' }}';
+        break;
+      default:
+        var ddmmyy = '{{res.response_time | date:'d/m/Y, h:i A' }}';
+      }
+
+      alldate.eq(i).text(ddmmyy);
+  {% endfor %}
+
+});
+
+</script>
+
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<script type="text/javascript">
+
+$('#fetchgraph').click(function(){
+  $('#restbl').hide();
+  $('#showtable').text("Show Table");
+  $('#graphdiv').show();
+  $('#graphdiv').text("Loading...");
+
+
+    $.ajax(
+  {
+      type:"post",
+      url: "/quiz/graph/{{quiz.id}}",
+      data:{ 
+      },
+
+      headers: {'X-CSRFToken': '{{ csrf_token }}'},
+      success: function( data ) 
+      {
+        $('#graphdiv').empty();
+        $('#graphdiv').text(data.msz);
+        var Qfreq = data.freqdict;
+        for (x in Qfreq){
+          var thisid = "chart" + x;
+          var qtitle = Qfreq[x].title;
+          var qtype = Qfreq[x].type;
+          if (parseInt(qtype)==3){
+            charttype = "column";
+          }
+          else{ charttype="pie"; }
+
+          var data_arr = [];
+
+          for (y in Qfreq[x].optfreq){
+              data_arr.push( { 
+                label:Qfreq[x].optfreq[y][1],
+                y:parseInt(Qfreq[x].optfreq[y][0])
+              });
+          }
+          if (Qfreq[x].hasOwnProperty('other')) {
+              data_arr.push( { 
+                label:"other",
+                y:parseInt(Qfreq[x].other)
+              });
+          }
+
+        var newdiv = $("<div> </div>").addClass('onegraph');
+        var innerdiv = $("<div> </div>").attr('id', thisid).addClass('temp');
+        innerdiv.appendTo(newdiv);
+        newdiv.appendTo('#graphdiv');
+
+          var chart = new CanvasJS.Chart(thisid, {
+            title:{
+              text: qtitle              
+            },
+
+          animationEnabled: true,
+          zoomEnabled:true,
+          theme: "light1",    // "light1", "dark1", "dark2"
+          exportFileName: "graph-" + qtitle,
+          exportEnabled: true,
+          // dataPointMaxWidth: 40,
+          // width: 300,
+
+            data: [              
+            {
+              type: charttype,    //line, doughnut, column
+              dataPoints: data_arr
+            }
+            ]
+          });
+
+          chart.render();
+
+        }
+
+        $('#fetchgraph').hide();
+        $('#showgraph').show();
+
+      }
+   })
+
+});
+
+</script>
+
+</body>
+</html>

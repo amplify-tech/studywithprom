@@ -1,0 +1,208 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Home</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="{% static 'icon.png' %}" rel="icon">
+  <link href="{% static 'icon.png' %}" rel="apple-touch-icon">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}">
+
+<style>
+  #reg_msz{
+    color: red;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+</style>
+</head>
+
+<body>
+<nav id="heading"> Myform</nav>
+<br><br>
+
+<div class="form">
+<button class="login active"> Login </button><button class="register"> Register </button>
+
+<div class="login_div">
+  <form action="/login/" method="POST"> 
+      {% csrf_token %}
+
+  <p>Email </p><input type="email" placeholder="email" name="email_login" minlength="5" maxlength="40" required ><br>
+  <p>Password <span class="hide_pswd">&#128065;</span> </p> <input type="password" placeholder="Password" class="pswd" name="pswd_login"  maxlength="30" required>
+  <br><br>
+  <button class="submit_type" type="submit" >Login</button>
+
+    <div class="errormsz" style="line-height:1.2 ">
+      {% for message in messages %}
+        <p>{{message}}</p>
+      {% endfor %}
+    </div>
+
+  </form>
+
+</div>
+
+<div class="reg_div" style="display: none;">
+  <p>Full name <span id="msz_name"></span> </p> 
+  <input type="text" placeholder="Full name" id="fullname">
+  
+  <p>Email  <span id="msz_email"></span></p>
+  <input type="email" placeholder="email" id="email_reg"> 
+
+  <p>Password  <span class="hide_pswd">&#128065;</span> </p>
+  <input  type="password" placeholder="Password" class="pswd" id="pswd_reg">
+  <p id="msz_pswd"></p>
+
+  <p>Confirm Password </p>
+  <input  type="password" placeholder="Password" class="pswd" id="pswd_reg_1"> 
+  <br>
+
+  <p id="reg_msz"></p>
+
+
+  <button class="submit_type" id="register_me" > Register </button>
+</div>
+
+</div>
+
+<br>
+<div class="content">
+<div class="box box1">
+  <h2>About</h2>
+  <p> myform is a online survey management platform
+  </p> 
+</div>
+
+<div class="box box2">
+  <h2>Features</h2>
+  <p> create your own form for survey , create a quiz, add collabrater.</p> 
+</div>
+
+<div class="box box3">
+  <h2>Info</h2>
+  <p> {{ numuser}} registered users</p> 
+</div>
+</div>
+
+<br><br>
+
+<footer>
+  <div>
+  <a href="/team/">team</a> |
+  <span> &#169; 2020 Myform Product </span>
+  </div>
+</footer>
+
+
+<script>
+ $('.login').click(function(){
+ 		$('.login').attr("class", "login active");
+ 		$('.register').attr("class", "register");
+ 		$('.login_div').show();
+    $('.reg_div').hide();
+	$('html, body').animate({ scrollTop: $("#heading").offset().top },'slow');
+
+ });
+ $('.register').click(function(){
+    $(".form").css("min-height","480px")
+ 		$('.register').attr("class", "register active");
+ 		$('.login').attr("class", "login");
+ 		$('.login_div').hide();
+ 		$('.reg_div').show();
+	$('html, body').animate({ scrollTop: $("#heading").offset().top },'slow');
+
+ });
+ $('.hide_pswd').click(function(){
+ 	var oldtype = $('.pswd').attr("type"); 
+ 	if (oldtype=="password") {
+ 		$('.pswd').attr("type", "text");
+ 		$('.hide_pswd').css("text-decoration", "line-through");
+ 	}
+ 	else {
+ 		$('.pswd').attr("type", "password");
+ 		$('.hide_pswd').css("text-decoration", "none");
+ 	}
+
+ });
+
+</script>
+
+
+<script>
+  $('#register_me').click(function(){
+  var myname = $("#fullname").val();
+  var myemail = $("#email_reg").val();
+  var mypswd1 = $("#pswd_reg").val();
+  var mypswd2 = $("#pswd_reg_1").val();
+  $('#msz_name').text("");
+  $('#msz_email').text("");
+  $('#msz_pswd').text("");
+  $('#reg_msz').text("");
+
+  var isvalid=true;
+  if (myname.length <4){
+        isvalid=false;
+       $('#msz_name').text("* atleast 4 characters required");
+  }
+  else if (myname.length >25){
+        isvalid=false;
+       $('#msz_name').text("* maximum 25 characters");
+  }
+  if (myemail.length <5 || myemail.length >40 || !(myemail.includes("@"))){
+        isvalid=false;
+       $('#msz_email').text("* Invalid email");
+  }
+  if (mypswd1.length <5){
+        isvalid=false;
+       $('#msz_pswd').text("* atleast 5 characters required");
+  }
+  if (mypswd2.length <5){
+        isvalid=false;
+       $('#msz_pswd').text("* atleast 5 characters required");
+  }
+  if (mypswd2.length >25){
+        isvalid=false;
+       $('#msz_pswd').text("* maximum 25 characters");
+  }
+  if (mypswd2 != mypswd1){
+        isvalid=false;
+       $('#msz_pswd').text("* password not match");
+  }
+  if (isvalid) {
+
+      $.ajax(
+      {
+          type:"post",
+          url: "/register/",
+          data:{
+                   myname: myname,
+                   myemail: myemail,
+                   mypswd1: mypswd1,
+                   mypswd2: mypswd2
+          },
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: function(data) 
+          {
+            if(data.status=="valid"){
+              window.location = data.url;
+            }
+            else{
+              $('#reg_msz').text(data.msz);
+            }
+          }
+       })
+
+
+
+  }
+});
+
+</script>
+
+</body>
+</html>

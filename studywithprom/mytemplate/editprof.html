@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>edit profile</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="{% static 'icon.png' %}" rel="icon">
+  <link href="{% static 'icon.png' %}" rel="apple-touch-icon">
+<style>
+  body{
+    font-size: 18px;
+    margin: 0;
+  }
+  nav{
+    width: 100%;
+    padding: 4px 12px;
+    margin: 0;
+    background-color: black;
+    color: white;
+    font-size: 28px;
+    position: fixed;
+    top: 0;
+    text-align: center;
+  }
+  #formdiv{
+    margin-right: auto;
+    margin-left: auto;
+    width: 85%;
+    max-width: 500px;
+    border: 1px solid black;
+    line-height: 0.8;
+    padding: 2px 5px 14px 5px;
+  }
+  input{
+    width: 90%;
+    font-size: 20px;
+  }
+  button{
+    width: 80%;
+    display: block;
+    font-size: 20px;
+    margin-right: auto;
+    margin-left: auto;
+    border: 1px solid green;
+    padding: 5px;
+  }
+  summary{
+    border: none;
+    outline: none;
+    margin: 10px 8px;
+
+  }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <span>myform</span>
+</nav>
+
+<br><br><br>
+<div id="formdiv">
+
+<form action="/profile/editprofile" method="POST"> 
+{% csrf_token %}
+<p>email :</p>
+<input type="email" name="email" placeholder="email" disabled value="{{user.email}}">
+<p>full name : </p>
+<input type="text" name="fullname" placeholder="fullname (3-25 char)" value="{{user.first_name}}">
+<br>
+<br>
+<details>
+  <summary>change password</summary>
+  <p onclick="show()"> &#128065; </p>
+<input id="pswd1" type="password" name="psswd" placeholder="password (4-25 char)"> <br><br>
+<input id="pswd2" type="password" name="psswd2" placeholder="re-enter password">
+</details>
+<br><br>  
+
+<button type="submit">submit</button>
+    <div style="color: #cc0000">
+      {% for message in messages %}
+        <p>{{message}}</p>
+      {% endfor %}
+    </div>
+
+</form>
+</div>
+
+<script>
+function show(){
+  var inputs = document.getElementById('pswd1');
+  var inputs2 = document.getElementById('pswd2');
+  var old = inputs.getAttribute("type");
+  if(old=="password"){
+    inputs.setAttribute("type", "text");
+    inputs2.setAttribute("type", "text");
+  }
+  else{
+    inputs.setAttribute("type", "password");
+    inputs2.setAttribute("type", "password");
+  }
+}
+
+</script>
+
+</body>

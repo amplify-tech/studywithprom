@@ -1,0 +1,297 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>viewform</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="{% static 'icon.png' %}" rel="icon">
+  <link href="{% static 'icon.png' %}" rel="apple-touch-icon">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<style>
+  body{
+    font-size: 18px;
+    font-family: "Helvetica Neue", "Helvetica, Arial", sans-serif;
+    background-color: {{quiz.style.bgcolor}};  
+  }
+  td{
+    padding-bottom: 8px;
+  }
+  td:first-child{
+    vertical-align: top;
+  }
+
+  .allq{
+    margin-left: auto;
+    margin-right: auto;
+    width: 95%;
+    max-width: 600px;
+  }
+
+  .header{
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 8px 8px 0;
+    border-radius: 10px;
+    background-color: {{quiz.style.head}}; 
+  }
+
+  .oneq{
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 2px 8px 10px 8px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    background-color: {{quiz.style.theme}};
+  }
+  .reqerror{
+    color: #800000;
+  }
+  .answer{
+    margin-left: 5px;
+
+  }
+  input.answer{
+    font-size: 18px;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    border-bottom: 1px solid #800000;
+  }
+
+  input[type=text].answer{
+    width: 80%;
+  }
+  input[type=number].answer{
+    width: 50%;
+  }
+
+  input[type=radio].answer{
+    width: 18px;
+    height: 18px;
+  }
+  input[type=checkbox].answer{
+    width: 18px;
+    height: 18px;
+  }
+  #student_code{
+    background-color: transparent;
+    border: none;
+    outline: none;
+    border-bottom: 1px dotted  #800000;
+    font-size: 18px;
+    width: 120px;
+
+  }
+  #viewscore1{
+    display: inline-block;
+    font-size: 18px; 
+    padding: 5px 8px;
+    color: white;
+    background-color: #b300b3;
+    text-decoration: none;
+  }
+
+</style>
+<style>
+
+@media (max-width: 750px) {
+  input[type=radio]{
+    width: 20px !important;
+    height: 20px !important;
+  }
+  input[type=checkbox]{
+    width: 20px !important;
+    height: 20px !important;
+  }
+}
+  
+</style>
+</head>
+<body>
+
+<div class="allq" id="allq">
+    <div class="header">
+      <h2 style="text-align: center;">{{quiz.title}}</h2>
+      <p>{{quiz.desc}}</p>
+      <span>Student code:</span> 
+      <input type="text" id="student_code">
+      <br>
+    </div>
+
+        {% for Q , optlist in Qdict.items %}
+      <div class="oneq"  data-catid={{Q.id}}>
+
+         <p class="question"> {{ Q.title }}
+         <span style="float: right; color: blue;">{{ Q.pmarks }} marks</span>
+       </p>
+
+      <!-- short answer type -->
+    {% if Q.qtype == 0 %}
+      <div class="ansdiv shortans">
+        <input type="text" class="answer textans" placeholder="short answer here">
+      </div>
+      <!-- numeric answer type -->
+    {% elif Q.qtype == 1 %}
+      <div class="ansdiv">
+        <input type="number" class="answer textans" placeholder="numeric answer here">
+      </div>
+
+    <!-- mcq single ans -->
+    {% elif Q.qtype == 2 %}
+    <div class="ansdiv optans">
+      <table>
+        {% for opt in optlist %}
+        <tr>
+          <td>
+          <input type="radio" class="answer optans" data-catid={{opt.id}}
+           name="{{Q.id}}">
+         </td>
+         <td><span>{{opt.value}}</span></td>
+        </tr>
+        {% endfor %}
+    </table>
+      <button class="antiradio" style="display: none; float: right;">clear selection</button>
+      <br>
+
+    </div>
+
+    <!-- mcq multiple ans -->
+    {% elif Q.qtype == 3 %}
+    <div class="ansdiv optans">
+      <table>
+        {% for opt in optlist %}
+        <tr>
+          <td><input type="checkbox" class="answer optans" data-catid={{opt.id}}></td>
+          <td><span data-catid={{opt.id}} >{{opt.value}}</span></td>
+        </tr>
+        {% endfor %}
+        
+      </table>
+    </div>
+    
+    {% else %}
+    <p style="color: red;">Question type not match !</p>
+      
+    {% endif %}
+
+      </div>
+  {% endfor %}
+
+      <br>
+      <p class="reqerror" style="display: none;"> please fill the required fileds! </p>
+      <button  id="saveform" style="font-size: 18px; color: white;
+      background-color: #b300b3; margin-left: 40%; margin-right: 40%;"> Submit </button>
+      <br>
+    </div>
+
+
+<br><br>
+<div style="display: none; text-align: center;" id="viewscorediv">
+  <h2>Your response has been recorded</h2>
+
+  <a id="viewscore1" href="/"> View score </a>
+  <p id="viewscore2"></p>
+  <p id="viewscore3">save this link to see your result any time</p>
+  <br>
+  <p>{{ quiz.title }}</p>
+  <p id="viewscore4"></p>
+
+</div>
+<br>
+<div style="text-align: center;">
+  <span> &#169; 2020 Myform Product </span>
+</div>
+<br>
+<script>
+
+$('#saveform').click(function(){
+  $('.reqerror').hide();
+
+  if(confirm('Are you sure you want to Submit this?')){
+  if(confirm('Are you really sure you want to Submit this?')){
+
+  var valid = true;
+
+  if (valid){ 
+  var student_code = $.trim($('#student_code').val());
+  var allqlist = $(".oneq");
+  var responseDict = {};
+  allqlist.each(function(j, obj) {
+      var qid = $(obj).attr("data-catid");
+
+      var textans = "";
+      textele = $(obj).find(".textans");
+      if (textele.length > 0) {
+            textans = $.trim($(textele).val());
+      } else {}
+
+      var optansdict = {};
+
+      var all_radio_ans = $(obj).find('input[type="radio"]:checked');
+      var all_checkbox_ans = $(obj).find('input[type="checkbox"]:checked');
+
+      all_radio_ans.each(function(x, obj) {
+        optansdict[x] = $(obj).attr("data-catid");
+      });
+
+      all_checkbox_ans.each(function(z, obj) {
+        optansdict[z] = $(obj).attr("data-catid");
+      });
+
+
+      var qdict = {"textans":textans, "optansdict":optansdict};
+
+     responseDict[qid] = qdict;
+   });
+
+      $.ajax(
+      {
+          type:"post",
+          url: "/quiz/saveresponse/{{quiz.id}}",
+          data:{ 
+               responseDict: JSON.stringify(responseDict),
+               student_code: student_code
+          },
+
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: function( data ) 
+          {
+            // alert(data.msz);
+            $('.allq').remove();
+            $('#viewscorediv').show();
+            $('#viewscore1').attr("href", data.resultlink);
+            $('#viewscore2').text(data.resultlink);
+            $('#viewscore4').text("student code:" + student_code);
+            $('#saveform').remove();
+          }
+       })
+
+  }
+  else{
+    $('.reqerror').show();
+  }
+}}
+
+});
+
+
+$('.antiradio').click(function(){
+  var parent = $(this).closest('.oneq');
+  var allRadio = $(parent).find('input[type="radio"]:checked');
+  allRadio.prop("checked", false);
+  $(this).hide();
+});
+
+$('input[type=radio]').change(function() {
+ $(this).closest('.oneq').find('.antiradio').show();
+});
+
+</script>
+</body>
+</html>

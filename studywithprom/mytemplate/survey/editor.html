@@ -1,0 +1,1016 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Editor</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="{% static 'icon.png' %}" rel="icon">
+  <link href="{% static 'icon.png' %}" rel="apple-touch-icon">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/editor2.css' %}">
+<style>
+  body{
+    font-size: 18px;
+    background-color: {{survey.style.bgcolor}};  
+  }
+
+  .main{
+    display: inline-flex;
+    width: 100%;
+  }
+  .box2{
+    width: 100%;
+    max-width: 750px;
+    border: 2px solid black;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 24px;
+    margin-bottom: 15px;
+  }
+  .form_ttl_div{
+    padding: 10px 0;
+    background-color: {{survey.style.head}};
+  }
+  .form_ttl{
+    font-size: 20px;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    border-bottom: 2px solid #cc00cc;
+  }
+  #form_title{
+    font-size: 24px;
+    width: 80%;
+    margin-left: 8%;
+    margin-top: 5px;
+  }
+  #form_desc{
+    width: 80%;
+    margin-left: 8%;
+    margin-top: 5px;
+    margin-bottom: 15px;
+  }
+  #form_exdate{
+    width: 280px;
+    margin-left: 8px;
+    }
+
+  #createQ{
+    color: green;
+    font-size: 42px;
+    position: fixed;
+    top: 220px;
+    background-color: white;
+    padding: 0 6px;
+    text-align: center;
+    cursor: pointer;
+    z-index: 99;
+  }
+  #createQ:active{
+    background-color: #ff9933;
+
+  }
+  .oneq{
+    border-radius: 10px;
+    padding: 15px 10px;
+    margin: 10px 5px;
+    background-color: {{survey.style.theme}};
+  }
+  .oneq:hover{
+    border: 2px solid maroon;
+  }
+  .oneq ul li{
+    margin: 6px 0;
+  }
+  .question{
+    width: 50%;
+    margin-right: 15px;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    border-bottom: 2px solid #cc00cc;
+  }
+  .question:hover{
+    border-bottom: 2px dashed #cc00cc;
+  }
+
+  .qtype_select{
+    background-color: #f2f2f2;
+  }
+  .ansdiv{
+    font-size: 16px;
+    padding: 5px 10px 5px 15px;
+    margin: 8px 12px;
+  }
+  .answer{
+    background-color: transparent;
+    border: none;
+    outline: none;
+    border-bottom: 1px solid #800000;
+    flex-shrink: 1;
+  }
+  .answer.optans{
+    width: 50%;
+    min-width: 200px;
+    margin: 2px 8px 3px 1px;
+  }
+  .answer.constraint{
+    width: 100px;
+  }
+
+  input[type=file].answer{
+    border:none;
+    border-bottom:none;
+  }
+  input[type=color]{
+    width: 50px;
+    height: 28px;
+  }
+
+
+  .remove_opt{
+    font-size: 18px; 
+    color: #990033; 
+    cursor: pointer;
+  }
+  .removeQ{
+    font-size: 24px;
+    color: #990033; 
+    cursor: pointer;
+    margin: 4px;
+    vertical-align: middle;
+  }
+  .copyQ{
+    vertical-align: middle;
+    font-size: 0;
+    padding: 8px 7px 9px 7px ;
+    border-right: 6px double black;
+    border-bottom: 6px double black;
+    border-top:  1px solid black;
+    border-left: 1px solid black;
+    margin: 0 8px;
+    cursor: pointer;
+  }
+
+
+
+  @media (max-width:750px) {
+    #createQ{
+      position: fixed;
+      top: 300px;
+      right: 5px;
+    }
+    .qtype_select{
+      font-size: 14px;
+    }
+    .gmail{
+      font-weight: bold;
+    }
+
+    .ansdiv{
+      font-size: 15px;
+      padding: 5px 5px 5px 4px;
+      margin: 8px 6px;
+    }
+    .question{
+      border: none;
+      border-bottom: 1px solid #cc00cc;
+    }
+    input[type=radio]{
+      width: 20px;
+      height: 20px;
+    }
+    input[type=checkbox]{
+      width: 20px;
+      height: 20px;
+    }
+
+  }
+
+
+</style>
+<style>
+
+    .shareicon{
+      font-size: 28px;
+      border-radius: 50%;
+      color: white !important;
+      display: inline-block; 
+      text-align: center; font-weight: bold;
+      width: 34px; height: 34px; 
+      text-decoration: none !important;
+      margin: 6px;
+    }
+    .email{
+      font-size: 30px;
+      text-decoration: none !important;
+    }
+    .gmail{
+      font-size: 36px;
+      color: #ff3333 !important;
+      text-decoration: none !important;
+    } 
+    .facebook{
+      background-color:  #4267b2; 
+    }  
+    .linkedin{
+      background-color: #0077B5; 
+      width: 36px; height: 36px;  
+    }  
+    .twitter{
+      background-color: #38A1F3;
+    }
+    .btn{
+      font-size: 18px;
+      padding: 2px 8px;
+    }
+
+</style>
+
+</head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <span class="navbar-brand" style="color: white;">Create your form</span>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+
+<a role="button" class="btn btn-primary navbar-btn" target="_blank" 
+   href="{{sharinglink}}">Preview</a>
+<a role="button" class="btn btn-success navbar-btn" target="_blank" 
+   href="/survey/response/{{survey.id}}">Response</a>
+<a role="button" class="btn btn-info navbar-btn" target="_blank" 
+   href="/survey/orderq/{{survey.id}}">shuffle Q</a>
+</ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li ><a href="/"><span class="glyphicon glyphicon-user"></span> {{user.first_name}}</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- <div class="container-fluid"> -->
+
+<span id="status" style="position: fixed; bottom: 2px; right: 2px; padding: 4px; 
+      background-color: black; color:white;">autosave</span>
+
+
+<br><br>
+
+<div style="text-align: center;">
+<button id="styleme" class="btn btn-warning navbar-btn" style="background: linear-gradient(to right, #ffff00 0%, #ff5050 100%); color: black;">style</button>
+<button id="shareme" class="btn btn-primary navbar-btn">share  &#10146;</button>
+</div>
+
+
+<div id="styleme_div" style="margin: 8px 0; display: none;">
+  <div style=" width: 220px; margin-left: auto; margin-right: auto; line-height: 2;">
+  <input type="color" id="themecolor" value="{{survey.style.theme}}">
+  <span> theme </span><br>
+  <input type="color" id="bgcolor" value="{{survey.style.bgcolor}}">
+  <span> background color </span><br>
+  <input type="color" id="headcolor" value="{{survey.style.head}}">
+  <span> header </span><br>
+  <button id="setDefaultColor" class="btn btn-secondary">default</button>
+  <button id="savestyle" class="btn btn-success">save style</button>
+</div>
+</div>
+
+<div id="sharing_div" style="display: none; text-align: center;">
+    <!-- Email / gmail -->
+    <a target="_blank" class="gmail" href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=&su=form: {{survey.title}}&body=I%20am%20inviting%20you%20to%20fill%20this%20form:-%20%0D%0A{{sharinglink}}%20%0D%0A%0D%0A{{survey.desc}}&ui=2&tf=1&pli=1">
+      
+      &#9993; </a>
+
+    <a target="_blank" class="email" href="mailto:?Subject=form: {{survey.title}}&amp;Body=I%20am%20inviting%20you%20to%20fill%20this%20form:-%20%0D%0A{{sharinglink}}%20%0D%0A%0D%0A{{survey.desc}}">
+     
+      &#x1F4E7; </a>
+ 
+    <!-- Facebook -->
+    <a class="shareicon facebook" href="http://www.facebook.com/sharer.php?u={{sharinglink}}" target="_blank">
+
+      f </a>
+    
+    <!-- LinkedIn -->
+    <a class="shareicon linkedin" href="http://www.linkedin.com/shareArticle?mini=true&amp;url={{sharinglink}}" target="_blank">
+      
+      in </a>
+  
+    <!-- Twitter -->
+    <a class="shareicon twitter" href="https://twitter.com/share?url={{sharinglink}}&amp;text=I%20am%20inviting%20you%20to%20fill%20this%20form3&amp;" target="_blank">
+     
+      t </a>
+  
+    <!-- Print / pdf -->
+    <button id="printpage" class="btn btn-secondary">save as PDF</button>
+
+    <p style="font-size: 16px;">{{sharinglink}}</p>
+    <input style="font-size: 14px;" onClick="this.select();" id="linkInput" value="{{sharinglink}}">
+    <button id="copylinkbtn" style="font-size: 14px; padding: 0 1px;"> copy link </button>
+    <span id="textcopied" style="display: none; font-size: 16px;"> link copied </span>
+    <br><br>
+    <p style="font-size: 14px;">Note:- on sharing recipients will  receive link (or pdf) to preview page, they can only fill this form, they won't have  access to edit this form</p>
+
+</div>
+
+<span id="createQ">  &#8853;  </span>
+
+<div class="main">
+  <div class="box2">
+
+<!-- form heading -->
+  <div class="form_ttl_div">
+  <input type="text"  id="form_title" class="form_ttl" value="{{survey.title}}"
+          placeholder="Form title">
+  <br>
+  <input type="text"  id="form_desc" class="form_ttl" value="{{survey.desc}}"
+          placeholder="Form description" >
+  <br>
+  <span style="margin-left: 10px;"> deadline :-</span>
+  <input type="datetime-local"  id="form_exdate" class="form_ttl" 
+       value="{{survey.endDate|date:'Y-m-d\TH:i'}}">
+
+  </div>
+
+<!-- question div -->
+
+      <div class="allq" id="allq">
+          {% for Q , optlist in Qdict.items %}
+      <div class="oneq"  data-catid={{Q.id}}>
+
+        <div class="line1" style="display: flex; flex-wrap: wrap;">
+
+        <input type="text" style="flex-grow: 1" value="{{ Q.title }}" class="question">
+
+        <select class="qtype_select" >
+          {% for opt in qtyparr %}
+                {% if forloop.counter == Q.qtype|add:1 %}
+                <option selected>{{opt}}</option>
+                {% else %}
+                <option>{{opt}}</option>
+                {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+        
+
+      <!-- short answer type -->
+    {% if Q.qtype == 0 %}
+      <div class="ansdiv shortans">
+        <input type="text" class="answer" placeholder="short answer here" disabled="true">
+      </div>
+      <!-- long answer type -->
+    {% elif Q.qtype == 1 %}
+      <div class="ansdiv longans">
+        <input type="text" class="answer" placeholder="long answer here" disabled="true">
+      </div>
+
+        <!-- date answer type -->
+    {% elif Q.qtype == 6 %}
+      <div class="ansdiv dateans" >
+        <input type="date" class="answer">
+      </div>
+      <!-- time answer type -->
+    {% elif Q.qtype == 7 %}
+      <div class="ansdiv timeans" >
+        <input type="time" class="answer" >
+      </div>
+      <!-- file upload answer type -->
+    {% elif Q.qtype == 8 %}
+      <div class="ansdiv fileans">
+        <input type="file" class="answer">
+      </div>
+
+      <!-- linear scale answer type -->
+    {% elif Q.qtype == 5 %}
+
+      <div class="ansdiv linearans">
+        <span>start index : </span> <input type="number" class="answer constraint"
+         value="{{Q.constraint.0|default:1}}">
+        <span>last index : </span> <input type="number" class="answer constraint"
+         value="{{Q.constraint.1|default:10}}"> <br>
+        <span>start label : </span> <input type="text" class="answer constraint" 
+        value="{{Q.constraint.2}}" placeholder="low">
+        <span>last label : </span> <input type="text" class="answer constraint"
+         value="{{Q.constraint.3}}" placeholder="high">
+      </div>
+
+    {% elif Q.qtype >= 2 and Q.qtype <= 4 %}
+
+    <div class="ansdiv optans">
+      <ol>
+        {% for opt in optlist %}
+        <li>
+          <input type="text" class="answer optans" data-catid={{opt.id}}  value="{{opt.value}}">
+          <span class="remove_opt"> &#x2718; </span>
+        </li>
+        {% endfor %}
+        
+      </ol>
+      <ul>
+        <li> <button class="addopt">add new option</button> </li>
+        <li style="display: inline;">
+            {% if Q.other %}
+              <span class="isother_text">other "allowed"</span>
+              <label class="switch">
+              <input type="checkbox" class="isother" checked>
+              <span class="slider round"></span>
+              </label>
+            
+            {% else %}
+              <span class="isother_text">other "not allowed"</span>
+              <label class="switch">
+              <input type="checkbox" class="isother">
+              <span class="slider round"></span>
+              </label>
+            
+            {% endif %}
+          </li>
+      </ul>
+    </div>
+    
+    {% else %}
+    <p style="color: red;">Question type not match !</p>
+      
+    {% endif %}
+
+
+    <div style="float: right;">
+
+        <span style="color: #990000;">Required</span>
+        <label class="switch">
+            {% if Q.required %}
+              <input type="checkbox" class="isreq" checked>
+            {% else %}
+              <input type="checkbox" class="isreq">
+            {% endif %}
+          <span class="slider round"></span>
+        </label>
+
+        <span class="copyQ">  </span>
+        <span class="removeQ"> &#x2718; </span>
+
+      </div>
+      <br>
+
+     
+
+      </div>
+  {% endfor %}
+        
+      </div>
+  </div>
+<!-- this will be used for cloning, create a new Q -->
+  <div class="faltu" style="display: none;">
+    <!-- header of all type questions -->
+      <div class="oneq" id="headQ"  data-catid=-2>
+
+        <div class="line1" style="display: flex; flex-wrap: wrap;">
+
+        <input type="text" style="flex-grow: 1" value="write your question here" class="question">
+
+        <select class="qtype_select">
+          <option> Short Ans </option>
+          <option> Paragraph </option>
+          <option> Multiple choice </option>
+          <option> Checkboxes </option>
+          <option> Drop-down </option>
+          <option> linear scale </option>
+          <option> Date </option>
+          <option> Time </option>
+          <option> File upload </option>
+        </select>
+
+        </div>
+
+
+      <div style="float: right;">
+
+        <span style="color: #990000;" >Required</span>
+        <label class="switch">
+          <input type="checkbox" class="isreq">
+          <span class="slider round"></span>
+        </label>
+
+        <span class="copyQ">  </span>
+        <span class="removeQ"> &#x2718; </span>
+
+      </div>
+      <br>
+
+      </div>
+
+<!-- short answer type -->
+<div class="ansdiv shortans" id="shortans_demo">
+  <input type="text" class="answer" placeholder="short answer here" disabled="true">
+</div>
+<!-- long answer type -->
+<div class="ansdiv longans" id="longans_demo">
+  <input type="text" class="answer" placeholder="long answer here" disabled="true">
+</div>
+
+  <!-- date answer type -->
+<div class="ansdiv dateans" id="dateans_demo">
+  <input type="date" class="answer">
+</div>
+<!-- time answer type -->
+<div class="ansdiv timeans" id="timeans_demo">
+  <input type="time" class="answer" >
+</div>
+<!-- file upload answer type -->
+<div class="ansdiv fileans" id="fileans_demo">
+  <input type="file" class="answer">
+</div>
+
+<!-- linear scale answer type -->
+<div class="ansdiv linearans" id="linearans_demo">
+  <span>start index : </span> <input type="number" class="answer constraint" value="1">
+  <span>last index : </span> <input type="number" class="answer constraint" value="10"> <br>
+  <span>start label : </span> <input type="text" class="answer constraint" placeholder="low">
+  <span>last label : </span> <input type="text" class="answer constraint" placeholder="high">
+</div>
+
+<!-- options answer type -->
+  <div class="ansdiv optans" id="optans_demo">
+    <ol>
+      <li>
+        <input type="text" data-catid=-1 class="answer optans" value="option-1">
+          <span class="remove_opt"> &#x2718; </span>
+      </li>
+      
+    </ol>
+    <ul>
+      <li> <button class="addopt">add new option</button> </li>
+      <li style="display: inline;">
+        <span class="isother_text">other "not allowed"</span>
+        <label class="switch">
+          <input type="checkbox" class="isother">
+          <span class="slider round"></span>
+        </label>
+        </li>
+    </ul>
+  </div>
+<!-- new options -->
+      <li id="newopt">
+        <input type="text" class="answer optans" value="option-1">
+          <span class="remove_opt"> &#x2718; </span>
+      </li>
+
+
+  </div>
+
+
+</div>
+<!-- </div> -->
+<br><br><br><br>
+<script>
+
+  qtype_arr =['shortans_demo','longans_demo','optans_demo','optans_demo','optans_demo' , 
+  'linearans_demo', 'dateans_demo', 'timeans_demo','fileans_demo'];
+
+
+// create new question
+$('#createQ').click(function(){
+  var newqdiv = $('#headQ').clone(true,true).removeAttr('id').attr("data-catid",-1);
+  var line11 = $(newqdiv).find('.line1');
+  $('#shortans_demo').clone(true,true).removeAttr('id').insertAfter(line11);
+
+      $.ajax(
+      {
+          type:"post",
+          url: "/survey/addoneq/{{survey.id}}",
+          data:{ },
+
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: function( data ) 
+          {
+            $(newqdiv).attr("data-catid", parseInt(data.id));
+            newqdiv.appendTo(".allq");
+
+             $("html, body").animate({ 
+                    scrollTop: $( 
+                      'html, body').get(0).scrollHeight 
+                }, "slow"); 
+
+          }
+       })
+
+});
+
+// add options
+$('.addopt').click(function(){
+  var parent =$( $($(this).closest("ul")).siblings("ol"));
+  var x =  (parent.find("li").length) +1;
+  var optval = "option-"+x;
+  var newopt = $('#newopt').clone(true,true).removeAttr('id');
+  
+  var qid = parent.closest(".oneq").attr("data-catid");
+
+      $.ajax(
+      {
+          type:"post",
+          url: "/survey/addoneopt/{{survey.id}}",
+          data:{
+                   qid: qid,
+                   optval:optval
+          },
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: function( data ) 
+          {
+            newopt.find("input").attr({"value": optval, "data-catid": parseInt(data.id)});
+            newopt.appendTo(parent);
+          }
+       })
+
+
+  });
+
+// remove options
+$('.remove_opt').click(function(){
+  var parent = $($(this).closest("li"));
+  var optid = parent.find("input").attr("data-catid");
+  parent.remove();
+
+  if(optid > 0){
+      $.ajax(
+      {
+          type:"post",
+          url: "/survey/removeoneopt/{{survey.id}}",
+          data:{
+                   optid: optid
+          },
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: function( data ) 
+          {
+          }
+       })
+    } else{}
+
+  });
+
+// function for other allowed or not
+$('.isother').change(function () {
+  var parent =$($(this).closest("li"));
+  if($(this).is(':checked')){
+     parent.find(".isother_text").text("other \"allowed\"");
+
+  }
+  else{
+     parent.find(".isother_text").text("other \"not allowed\"");
+  }
+ });
+
+// copy a Q
+$('.copyQ').click(function(){
+    var parent =$($(this).closest(".oneq"));
+    var oldtype =parent.find(".qtype_select")[0].selectedIndex;
+    var oldqid =parent.attr("data-catid");
+
+      $.ajax(
+      {
+          type:"post",
+          url: "/survey/copyoneq/{{survey.id}}",
+          data:{
+              oldqid:oldqid
+            },
+
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: function( data ) 
+          {
+
+      var newclone  = $(parent.clone(true,true).removeAttr('id').attr("data-catid",parseInt(data.id)));
+      $(newclone.find(".qtype_select")[0]).prop('selectedIndex', oldtype);
+
+
+      if(oldtype >=2 && oldtype<=4){
+        var allopt = newclone.find('.answer');
+        allopt.each(function(i, obj) {
+            $(obj).attr("data-catid", parseInt(data.optidlist[i]));
+         });
+      } else{}
+
+
+      newclone.appendTo(".allq");
+
+     $("html, body").animate({ 
+            scrollTop: $( 
+              'html, body').get(0).scrollHeight 
+        }, "slow"); 
+
+
+          }
+       })
+
+
+  });
+
+// remove a Q
+$('.removeQ').click(function(){
+    var parent = $($(this).closest(".oneq"));
+    var qid = parent.attr("data-catid");
+    parent.slideUp("normal", function() { $(this).remove(); } );
+    if (qid > 0){
+    
+      $.ajax(
+      {
+          type:"post",
+          url: "/survey/removeoneq/{{survey.id}}",
+          data:{
+                   qid: qid
+          },
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: function( data ) 
+          {
+          }
+       })
+
+    } else{}
+  });
+
+
+$(document).on('change', '.isreq', function() {
+  var qid = $($(this).closest(".oneq")).attr("data-catid");
+  var isreq = $(this).is(':checked');
+
+      $.ajax(
+      {
+          type:"post",
+          url: "/survey/modifyoneq/{{survey.id}}",
+          data:{
+                   type: "isreq_changed",
+                   qid: qid,
+                   isreq: isreq
+          },
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: function( data ) 
+          {
+          }
+       })
+
+}); 
+
+
+//  change  question type
+$(document).on('change', '.qtype_select', function() {
+
+  var parent =$($(this).closest(".oneq")); 
+  var qid = parent.attr("data-catid");
+  var qtype = $(this)[0].selectedIndex;
+
+  // var optdiv = parent.find('.optans');
+  // var ansdiv = parent.find(".ansdiv");
+
+  if(qtype >= 2 && qtype <=4 && parent.find('.optans').length > 0) {
+    // only Q type changed , dont change the options if there are same options
+  }
+  else{
+    parent.find(".ansdiv").remove();
+    var line11 = parent.find('.line1');
+    var trget ="#" + qtype_arr[qtype];
+    $(trget).clone(true,true).removeAttr('id').insertAfter(line11);
+  }
+
+
+      $.ajax(
+      {
+          type:"post",
+          url: "/survey/modifyoneq/{{survey.id}}",
+          data:{
+                   type: "qtype_changed",
+                   qid: qid,
+                   qtype: qtype
+          },
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: function( data ) 
+          {
+            if (parseInt(data.id) > 0){
+              parent.find(".answer").attr("data-catid", parseInt(data.id));
+            }
+            else{
+            }
+
+          }
+       })
+
+}); 
+
+$(document).on('change', '.question', function() {
+  var qid = $($(this).closest(".oneq")).attr("data-catid");
+  var qtitle = $(this).val();
+
+      $.ajax(
+      {
+          type:"post",
+          url: "/survey/modifyoneq/{{survey.id}}",
+          data:{
+                   type: "qtitle_changed",
+                   qid: qid,
+                   qtitle: qtitle
+          },
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: function( data ) 
+          {
+          }
+       })
+
+}); 
+
+$(document).on('change', '.isother', function() {
+  var qid = $($(this).closest(".oneq")).attr("data-catid");
+  var isother = $(this).is(':checked');
+
+      $.ajax(
+      {
+          type:"post",
+          url: "/survey/modifyoneq/{{survey.id}}",
+          data:{
+                   type: "isother_changed",
+                   qid: qid,
+                   isother: isother
+          },
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: function( data ) 
+          {
+          }
+       })
+
+}); 
+
+$(document).on('change', '.answer.optans', function() {
+  var optid = $(this).attr("data-catid");
+  var optval = $(this).val();
+
+      $.ajax(
+      {
+          type:"post",
+          url: "/survey/modifyoneopt/{{survey.id}}",
+          data:{
+                   optid: optid,
+                   optval: optval
+          },
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: function( data ) 
+          {
+          }
+       })
+
+}); 
+
+$(document).on('change', '.answer.constraint', function() {
+
+  var qid = $(this).closest(".oneq").attr("data-catid");
+
+  var allconstraint = $(this).closest(".linearans").find(".answer.constraint");
+
+  var constdict = {}
+  allconstraint.each(function(j, obj) {
+      constdict[j]=$(obj).val();
+   });
+
+
+      $.ajax(
+      {
+          type:"post",
+          url: "/survey/modifyconst/{{survey.id}}",
+          data:{
+              qid: qid,
+              constdict: JSON.stringify(constdict)
+          },
+
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: function( data ) 
+          {
+          }
+       })
+
+}); 
+
+$(document).on('change', '.form_ttl', function() {
+    var form_title = $('#form_title').val();
+    var form_desc = $('#form_desc').val();
+    var form_exdate = $('#form_exdate').val();
+
+
+      $.ajax(
+      {
+          type:"post",
+          url: "/survey/modifysurvey/{{survey.id}}",
+          data:{
+              form_title : form_title ,
+              form_desc : form_desc ,
+              form_exdate : form_exdate ,
+
+          },
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: function( data ) 
+          {
+            // alert("success survey modified");
+          }
+       })
+
+}); 
+
+</script>
+
+<script>
+   
+$('#copylinkbtn').click(function(){
+  try{
+    var copyText = $('#linkInput');
+    copyText.select();
+    // copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+    document.execCommand("copy");
+
+    $('#textcopied').show().fadeOut(1000);
+  }
+  catch{}
+});
+
+$("#bgcolor").change(function(){
+  $('body').css("background-color", $(this).val());
+});
+
+$("#themecolor").change(function(){
+  $('.oneq').css("background-color", $(this).val());
+});
+
+$("#headcolor").change(function(){
+  $('.form_ttl_div').css("background-color", $(this).val());
+});
+
+$('#setDefaultColor').click(function(){
+  $('body').css("background-color", '#b3daff');
+  $('.oneq').css("background-color", '#b3ffb3');
+  $('.form_ttl_div').css("background-color", '#ffccff');
+  
+  $("#bgcolor").val('#b3daff');
+  $("#themecolor").val('#b3ffb3');
+  $("#headcolor").val('#ffccff');
+});
+
+
+$('#savestyle').click(function(){
+
+  var bgcolor = $('#bgcolor').val();
+  var theme = $('#themecolor').val();
+  var headcolor = $('#headcolor').val();
+
+      $.ajax(
+      {
+          type:"post",
+          url: "/survey/savestyle/{{survey.id}}",
+          data:{ 
+            bgcolor:bgcolor,
+            theme:theme,
+            headcolor:headcolor
+          },
+
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: function( data ) 
+          {   }
+       })
+
+});
+
+
+$('#styleme').click(function(){
+  $('#sharing_div').slideUp();
+  $('#styleme_div').slideToggle();
+});
+$('#shareme').click(function(){
+  $('#styleme_div').slideUp();
+  $('#sharing_div').slideToggle();
+});
+
+$('#status').click(function(){
+  $(this).hide();
+});
+
+$('#printpage').click(function(){
+   var URL = "{{sharinglink}}";
+    var W = window.open(URL);
+    W.window.print(); 
+});
+
+$(document).on({
+    ajaxStart: function() { $("#status").text("saving").show();    },
+     ajaxStop: function() { $("#status").text("saved").show().fadeOut(1200);  }    
+});
+
+</script>
+</body>
+</html>
