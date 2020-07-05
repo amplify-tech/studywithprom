@@ -449,7 +449,7 @@ def saveresponse(request, quiz_id=None):
 				textans=textans, options=optdict)
 			qresponse.save()
 
-		resultlink = 'http://192.168.43.35:8000/quiz/result/' + new_response.access_code
+		resultlink = 'https://studywithprom.pythonanywhere.com/quiz/result/' + new_response.access_code
 
 
 		response = {'msz':"response recorded", "resultlink":resultlink}
