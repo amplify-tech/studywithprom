@@ -604,7 +604,7 @@ def tocsv(request, quiz_id=None):
 			all_itsQ = QuestionQ.objects.filter(quiz=thequiz).values_list('title', flat=True) .order_by("id")  
 			# print(list(all_itsQ))
 
-			writer.writerow(['id', 'response timestamp', 'User'] + list(all_itsQ))
+			writer.writerow(['response timestamp', 'User', 'student code', "student report"] + list(all_itsQ))
 
 			all_its_PQres = PQresponseQ.objects.filter(response__quiz=thequiz)
 
@@ -612,7 +612,8 @@ def tocsv(request, quiz_id=None):
 
 			for res in all_response:
 				# print("-"*30)
-				thisrow=[res.id, res.response_time.strftime('%d-%b-%Y %I:%M %p'), res.user.first_name]
+				stdreport="https://studywithprom.pythonanywhere.com/quiz/result/" + res.access_code
+				thisrow=[res.response_time.strftime('%d-%b-%Y %I:%M %p'), res.user.first_name, res.std_code,stdreport]
 				oneres = all_its_PQres.filter(response=res).order_by("question__id")
 				for x in oneres:
 					if x.textans != "":

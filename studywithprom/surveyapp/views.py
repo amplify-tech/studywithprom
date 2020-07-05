@@ -25,7 +25,7 @@ utc=pytz.UTC
 
 qtyparr =['Short Ans', 'Paragraph', 'Multiple choice', 
 			'Checkboxes', 'Drop-down', 'linear scale', 
-			'Date', 'Time', 'File upload']
+			'Date', 'Time']
 
 def hash_int(n):
     mapping = list(range(48,48+10)) + list(range(97,97+26))
@@ -629,7 +629,7 @@ def tocsv(request, sur_id=None):
 			all_itsQ = Question.objects.filter(survey=thesurvey).values_list('title', flat=True) .order_by("id")  
 			# print(list(all_itsQ))
 
-			writer.writerow(['id', 'response timestamp', 'User'] + list(all_itsQ))
+			writer.writerow(['response timestamp', 'User'] + list(all_itsQ))
 
 			all_its_PQres = PQresponse.objects.filter(response__survey=thesurvey)
 
@@ -637,7 +637,7 @@ def tocsv(request, sur_id=None):
 
 			for res in all_response:
 				# print("-"*30)
-				thisrow=[res.id, res.response_time.strftime('%d-%b-%Y %I:%M %p'), res.user.first_name]
+				thisrow=[res.response_time.strftime('%d-%b-%Y %I:%M %p'), res.user.first_name]
 				oneres = all_its_PQres.filter(response=res).order_by("question__id")
 				for x in oneres:
 					if x.textans != "":
