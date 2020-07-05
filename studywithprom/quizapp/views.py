@@ -83,7 +83,7 @@ def editor(request, quiz_id=None):
 				optlist = OptionQ.objects.filter(question=Q).order_by('id')
 				qdict[Q]= optlist
 
-			sharinglink = 'http://192.168.43.35:8000/quiz/viewform/' + str(thequiz.access_code)
+			sharinglink = 'https://studywithprom.pythonanywhere.com/quiz/viewform/' + str(thequiz.access_code)
 
 			context={'quiz':thequiz, 'Qdict':qdict,
 					  'qtyparr':qtyparr, 'sharinglink':sharinglink}
